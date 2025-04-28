@@ -1,0 +1,97 @@
+
+-- GUI para Luna Executor
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local ClientList = Instance.new("ScrollingFrame")
+local UIListLayout = Instance.new("UIListLayout")
+
+-- Configuración básica
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+MainFrame.Position = UDim2.new(0.3, 0, 0.3, 0)
+MainFrame.Size = UDim2.new(0, 400, 0, 300)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+Title.Name = "Title"
+Title.Parent = MainFrame
+Title.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Font = Enum.Font.SourceSansBold
+Title.Text = "Información de Clientes"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 16
+
+ClientList.Name = "ClientList"
+ClientList.Parent = MainFrame
+ClientList.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+ClientList.Position = UDim2.new(0, 10, 0, 40)
+ClientList.Size = UDim2.new(1, -20, 1, -50)
+ClientList.CanvasSize = UDim2.new(0, 0, 0, 0)
+ClientList.ScrollBarThickness = 6
+
+UIListLayout.Parent = ClientList
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 5)
+
+-- Función para actualizar la lista de clientes
+local function updateClients()
+    local players = game:GetService("Players"):GetPlayers()
+    
+    for _, child in pairs(ClientList:GetChildren()) do
+        if child:IsA("Frame") then
+            child:Destroy()
+        end
+    end
+    
+    for _, player in pairs(players) do
+        local clientFrame = Instance.new("Frame")
+        clientFrame.Size = UDim2.new(1, -10, 0, 60)
+        clientFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        clientFrame.Parent = ClientList
+        
+        local nameLabel = Instance.new("TextLabel")
+        nameLabel.Position = UDim2.new(0, 10, 0, 5)
+        nameLabel.Size = UDim2.new(1, -20, 0, 20)
+        nameLabel.BackgroundTransparency = 1
+        nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+        nameLabel.Text = "Nombre: " .. player.Name
+        nameLabel.Parent = clientFrame
+        
+        local countryLabel = Instance.new("TextLabel")
+        countryLabel.Position = UDim2.new(0, 10, 0, 25)
+        countryLabel.Size = UDim2.new(0.5, -20, 0, 20)
+        countryLabel.BackgroundTransparency = 1
+        countryLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+        countryLabel.TextXAlignment = Enum.TextXAlignment.Left
+        countryLabel.Text = "País: " .. (player:GetAttribute("Country") or "Desconocido")
+        countryLabel.Parent = clientFrame
+        
+        local timeLabel = Instance.new("TextLabel")
+        timeLabel.Position = UDim2.new(0.5, 0, 0, 25)
+        timeLabel.Size = UDim2.new(0.5, -10, 0, 20)
+        timeLabel.BackgroundTransparency = 1
+        timeLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+        timeLabel.TextXAlignment = Enum.TextXAlignment.Left
+        timeLabel.Text = "Hora: " .. os.date("%H:%M", os.time())
+        timeLabel.Parent = clientFrame
+    end
+    
+    ClientList.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y)
+end
+
+-- Actualizar la lista cada 5 segundos
+spawn(function()
+    while wait(5) do
+        pcall(updateClients)
+    end
+end)
+
+-- Actualización inicial
+updateClients()
